@@ -52,7 +52,16 @@ namespace WinFormsApp2
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-
+            try
+            {
+                // 执行超链接操作，例如打开一个链接
+                System.Diagnostics.Process.Start("cmd","/c start https://www.bilibili.com");
+            }
+            catch (Exception ex)
+            {
+                // 处理异常，例如显示错误消息
+                MessageBox.Show("无法打开链接：" + ex.Message);
+            }
         }
     }
 }

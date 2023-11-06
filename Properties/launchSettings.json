@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CatCatNG": {
+      "commandName": "Project",
+      "jsWebView2Debugging": true
+    }
+  }
+}

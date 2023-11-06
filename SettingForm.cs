@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components.WebView.WindowsForms;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using WebP.Net;
 
@@ -8,6 +10,11 @@ namespace WinFormsApp2
         public SettingForm()
         {
             InitializeComponent();
+            var services = new ServiceCollection();
+            services.AddWindowsFormsBlazorWebView();
+            blazorWebView1.HostPage = "wwwroot\\index.html";
+            blazorWebView1.Services = services.BuildServiceProvider();
+            blazorWebView1.RootComponents.Add<CatCatNG.ui.page.setting.Setting>("#app");
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -21,7 +28,7 @@ namespace WinFormsApp2
                 using (MemoryStream stream = new MemoryStream(webpData))
                 {
                     // 使用 LibwebpSharp 来解码 WebP 图像
-                    
+
 
                     // 将 WebP 图像转换为 Bitmap
                     Bitmap bitmap = WebPDecoder.Decode(webpData);
@@ -55,7 +62,7 @@ namespace WinFormsApp2
             try
             {
                 // 执行超链接操作，例如打开一个链接
-                System.Diagnostics.Process.Start("cmd","/c start https://www.bilibili.com");
+                System.Diagnostics.Process.Start("cmd", "/c start https://www.bilibili.com");
             }
             catch (Exception ex)
             {

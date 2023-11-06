@@ -28,12 +28,30 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form2";
+            listView1 = new ListView();
+            SuspendLayout();
+            // 
+            // listView1
+            // 
+            listView1.Location = new Point(-2, 0);
+            listView1.Name = "listView1";
+            listView1.Size = new Size(778, 433);
+            listView1.TabIndex = 0;
+            listView1.UseCompatibleStateImageBehavior = false;
+            // 
+            // DanmuForm
+            // 
+            AutoScaleDimensions = new SizeF(11F, 24F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(776, 431);
+            Controls.Add(listView1);
+            Name = "DanmuForm";
+            Text = "Form2";
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private ListView listView1;
     }
 }

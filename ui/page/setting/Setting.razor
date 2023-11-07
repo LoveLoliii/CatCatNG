@@ -1,12 +1,10 @@
+@using CatCatNG.vo;
 @using Microsoft.Fast.Components.FluentUI
+@using Newtonsoft.Json;
 
 <FluentGrid Justify="JustifyContent.FlexStart" Spacing="3" Style="background-color: var(--neutral-layer-3);height: 100vh; width: 100vw;overflow: hidden;">
 
-    <FluentGridItem xs="6" sm="3" Style="height:100vh">
-        <div class="card" style="border:dotted 1px;">
-                    xs="6" sm="3"
-                </div>
-    </FluentGridItem>
+     
     
     <FluentGridItem xs="18" sm="9" Style="height:100vh;width:100vw">
         <FluentGrid Spacing="1" Justify="JustifyContent.Center">
@@ -18,25 +16,19 @@
             </FluentGridItem>
             <FluentGridItem xs="12" Justify="JustifyContent.Center" Style="height:50vh">
                 <div class="card" style="border:dotted 0px;">
-                    <FluentIcon  Icon="Icons.Regular.Size24.PlayCircle" OnClick="checkRoomId"/>
+                    <FluentIcon  Icon="Icons.Regular.Size48.PlayCircle" OnClick="checkRoomId"/>
                 </div>
                 <div>
                     <FluentDialog @ref="_myFluentDialog" @bind-Hidden="@Hidden" aria-label="Simple dialog" Modal=@_modal TrapFocus=@_trapFocus PreventScroll=@_preventScroll @ondialogdismiss=OnDismiss>
                         <FluentDialogHeader Visible="false" />
-                        <h2>错误的房间号</h2>
-                        <p>输入了非数字的字符</p>
-                        <p>请重试。</p>
+                        <h2>扫码登录</h2>
+                        <p>@responseText</p>
+                        <img src=@qrUrl  width="200" height="200" />
+                       
                         <FluentButton Appearance="Appearance.Accent" Autofocus="true" @onclick="OnClose">关闭</FluentButton>
 
                     </FluentDialog>
 
-                    <FluentDialog @ref="_qrDialog" @bind-Hidden="@QrHidden" aria-label="Simple dialog2" Modal=@_qrModal TrapFocus=@_qrTrapFocus PreventScroll=@_qrPreventScroll @ondialogdismiss=OnQrDismiss>
-                        <FluentDialogHeader Visible="false" />
-                        <h2>是否扫码登录</h2>
-                        <img url =@qrUrl />
-                        <FluentButton Appearance="Appearance.Accent" Autofocus="true" @onclick="OnQrClose">关闭</FluentButton>
-
-                    </FluentDialog>
                 </div>
             </FluentGridItem>
             </FluentGrid>
@@ -48,7 +40,7 @@
 
 @code {
     private string inputValue = "";
-    private string responseText = "";
+    private string responseText = "loading······";
     private string qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=123456";
 
     private FluentDialog? _myFluentDialog;
@@ -58,23 +50,14 @@
     private string? _status;
     private bool Hidden { get; set; } = true;
 
-    private FluentDialog? _qrDialog;
-    private bool _qrTrapFocus = true;
-    private bool _qrModal = true;
-    private bool _qrPreventScroll = true;
-    private string? _qrStatus;
-    private bool QrHidden { get; set; } = true;
 
-    private void checkRoomId()
+
+    private async Task checkRoomId()
     {
         if (!IsNumeric(inputValue))
         {
-            OnOpen();
+            await OnOpen();
             inputValue = string.Empty;
-        }
-        else
-        {
-            OnQrOpen();    
         }
     }
 
@@ -88,12 +71,12 @@
     {
         if (firstRender)
             _myFluentDialog!.Hide();
-            _qrDialog!.Hide();
     }
 
-    private void OnOpen()
+    private async Task OnOpen()
     {
         _status = "Dialog opened with button click";
+        await MakeGetRequest();
         _myFluentDialog!.Show();
         System.Diagnostics.Debug.WriteLine(_status);
     }
@@ -120,12 +103,18 @@
         try
         {
             // 发起 HTTP GET 请求
+            // 设置 Referer 头
+            httpClient.DefaultRequestHeaders.Referrer = new Uri("https://live.bilibili.com");
             HttpResponseMessage response = await httpClient.GetAsync("https://passport.bilibili.com/qrcode/getLoginUrl");
 
             if (response.IsSuccessStatusCode)
             {
                 // 如果响应成功，读取响应内容
                 responseText = await response.Content.ReadAsStringAsync();
+                BilibiliHttpResponse msg = JsonConvert.DeserializeObject<BilibiliHttpResponse>(responseText);
+                BilibiliLoginResponseData loginResponse =  msg.Data;
+                this.qrUrl = loginResponse.Url;
+                checkQrLogin(loginResponse);
             }
             else
             {
@@ -137,29 +126,8 @@
             responseText = "Error: " + ex.Message;
         }
     }
-
-    private void OnQrOpen()
-    {   
-         //MakeGetRequest();
-        _qrStatus = "Dialog opened with button click";
-        _qrDialog!.Show();
-        System.Diagnostics.Debug.WriteLine(_qrStatus);
-    }
-
-    private void OnQrClose()
+    protected void checkQrLogin(BilibiliLoginResponseData loginResponseData)
     {
-        _qrStatus = $"Dialog dismissed with reason: Close button clicked";
-        _qrDialog!.Hide();
-        System.Diagnostics.Debug.WriteLine(_qrStatus);
-    }
-
-    private void OnQrDismiss(DialogEventArgs args)
-    {
-        if (args is not null && args.Reason is not null && args.Reason == "dismiss")
-        {
-            _qrStatus = $"Dialog dismissed with reason: Dismissed";
-            _qrDialog!.Hide();
-            System.Diagnostics.Debug.WriteLine(_qrStatus);
-        }
+        
     }
 }

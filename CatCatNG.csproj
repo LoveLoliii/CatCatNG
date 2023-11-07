@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="6.0.553" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.3.0" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" Version="3.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="WebP_Net" Version="1.1.1" />
   </ItemGroup>
 
